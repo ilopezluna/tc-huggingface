@@ -59,6 +59,20 @@ public class OllamaHuggingFaceContainer extends OllamaContainer {
                 throw new ContainerLaunchException("Failed to download model: " + downloadModelFromHF.getStderr());
             }
 
+            if (huggingFaceModel.visionAdapter != null) {
+                ExecResult downloadVisionAdapter = execInContainer(
+                    "huggingface-cli",
+                    "download",
+                    huggingFaceModel.repository,
+                    huggingFaceModel.visionAdapter,
+                    "--local-dir",
+                    "."
+                );
+                if (downloadVisionAdapter.getExitCode() > 0) {
+                    throw new ContainerLaunchException("Failed to download vision adapter: " + downloadVisionAdapter.getStderr());
+                }
+            }
+
             ExecResult fillModelFile = execInContainer(
                 "sh",
                 "-c",
@@ -77,9 +91,9 @@ public class OllamaHuggingFaceContainer extends OllamaContainer {
         }
     }
 
-    public record HuggingFaceModel(String repository, String model, String modelfileContent) {
+    public record HuggingFaceModel(String repository, String model, String modelfileContent, String visionAdapter) {
         public HuggingFaceModel(String repository, String model) {
-            this(repository, model, "FROM " + model);
+            this(repository, model, "FROM " + model, null);
         }
     }
 }
