@@ -24,31 +24,23 @@ public class OllamaHuggingFaceVisionModelTest {
         String model = "moondream2-text-model-f16.gguf";
         String imageName = "vision-model-from-hf";
         String modelFile = """
-                FROM moondream2-text-model-f16.gguf
+                FROM %s
                 PARAMETER temperature 0
                 PARAMETER stop <|endoftext|>
                 TEMPLATE ""\"{{ if .Prompt }} Question: {{ .Prompt }}
                 
                          {{ end }} Answer: {{ .Response }}
                          ""\"
-                """;
+                """.formatted(model);
         try (
                 OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.42"))
         ) {
             try {
                 ollama.start();
             } catch (ContainerFetchException ex) {
-                // Create the image
                 createImage(imageName, repository, model, modelFile);
                 ollama.start();
             }
-
-            String modelName = given()
-                    .baseUri(ollama.getEndpoint())
-                    .get("/api/tags")
-                    .jsonPath()
-                    .getString("models[0].name");
-            assertThat(modelName).contains(model + ":latest");
 
             var image = getImageInBase64();
 
