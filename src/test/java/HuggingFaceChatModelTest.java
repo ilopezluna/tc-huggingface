@@ -9,7 +9,7 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
-public class OllamaHuggingFaceChatModelTest {
+public class HuggingFaceChatModelTest {
 
     @Test
     public void chatModelWithHuggingFace() {
@@ -31,9 +31,9 @@ public class OllamaHuggingFaceChatModelTest {
                     .header(new Header("Content-Type", "application/json"))
                     .body(new CompletionRequest(model + ":latest", List.of(new Message("user", "The meaning to life and the universe is")), false))
                     .post("/api/chat")
-                    .getBody().asString();
+                    .getBody().as(ChatResponse.class).message.content;
 
-            System.out.println(response);
+            System.out.println("Response from LLM (🤖)-> " + response);
         }
     }
 
@@ -49,4 +49,7 @@ public class OllamaHuggingFaceChatModelTest {
     record CompletionRequest(String model, List<Message> messages, boolean stream) {}
 
     record Message(String role, String content) {}
+
+    record ChatResponse(Message message) {
+    }
 }

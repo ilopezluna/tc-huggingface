@@ -10,7 +10,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class OllamaHuggingFaceEmbeddingModelTest {
+public class HuggingFaceEmbeddingModelTest {
 
     @Test
     public void embeddingModelWithHuggingFace() {
@@ -37,6 +37,7 @@ public class OllamaHuggingFaceEmbeddingModelTest {
 
             assertThat(embedding).isNotNull();
             assertThat(embedding.isEmpty()).isFalse();
+            System.out.println("Response from LLM (🤖)-> " + embedding);
         }
     }
 
