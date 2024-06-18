@@ -10,7 +10,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class OllamaHuggingFaceTest {
+public class OllamaHuggingFaceEmbeddingModelTest {
 
     @Test
     public void embeddingModelWithHuggingFace() {
@@ -18,23 +18,13 @@ public class OllamaHuggingFaceTest {
         String model = "bge-small-en-v1.5-q4_k_m.gguf";
         String imageName = "embedding-model-from-hf";
         try (
-            OllamaContainer ollama = new OllamaContainer(
-                DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.42")
-            )
+            OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.42"))
         ) {
             try {
                 ollama.start();
             } catch (ContainerFetchException ex) {
                 // Create the image
-                try (
-                    OllamaHuggingFaceContainer huggingFaceContainer = new OllamaHuggingFaceContainer(
-                        imageName,
-                        new OllamaHuggingFaceContainer.HuggingFaceModel(repository, model)
-                    )
-                ) {
-                    huggingFaceContainer.start();
-                    huggingFaceContainer.stop();
-                }
+                createImage(imageName, repository, model);
                 ollama.start();
             }
 
@@ -58,15 +48,14 @@ public class OllamaHuggingFaceTest {
         }
     }
 
-    public static class EmbeddingRequest {
-
-        public final String model;
-
-        public final String prompt;
-
-        public EmbeddingRequest(String model, String prompt) {
-            this.model = model;
-            this.prompt = prompt;
+    private static void createImage(String imageName, String repository, String model) {
+        var hfModel = new OllamaHuggingFaceContainer.HuggingFaceModel(repository, model);
+        try (var huggingFaceContainer = new OllamaHuggingFaceContainer(hfModel)) {
+            huggingFaceContainer.start();
+            huggingFaceContainer.commitToImage(imageName);
+            huggingFaceContainer.stop();
         }
     }
+
+    public record EmbeddingRequest(String model, String prompt) {}
 }

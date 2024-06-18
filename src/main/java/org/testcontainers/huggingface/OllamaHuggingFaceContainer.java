@@ -10,13 +10,10 @@ import java.io.IOException;
 
 public class OllamaHuggingFaceContainer extends OllamaContainer {
 
-    private final String imageName;
-
     private final HuggingFaceModel huggingFaceModel;
 
-    public OllamaHuggingFaceContainer(String imageName, HuggingFaceModel model) {
+    public OllamaHuggingFaceContainer(HuggingFaceModel model) {
         super(DockerImageName.parse("ollama/ollama:0.1.42"));
-        this.imageName = imageName;
         this.huggingFaceModel = model;
     }
 
@@ -78,22 +75,11 @@ public class OllamaHuggingFaceContainer extends OllamaContainer {
         } catch (IOException | InterruptedException e) {
             throw new ContainerLaunchException(e.getMessage());
         }
-
-        commitToImage(imageName);
     }
 
-    public static class HuggingFaceModel {
-
-        public final String repository;
-
-        public final String model;
-
-        public String modelfileContent;
-
+    public record HuggingFaceModel(String repository, String model, String modelfileContent) {
         public HuggingFaceModel(String repository, String model) {
-            this.repository = repository;
-            this.model = model;
-            this.modelfileContent = "FROM " + model;
+            this(repository, model, "FROM " + model);
         }
     }
 }
