@@ -83,12 +83,5 @@ public class OllamaHuggingFaceVisionModelTest {
         }
     }
 
-    record CompletionRequest(String model, String prompt, List<String> images, boolean stream) {
-        public CompletionRequest(String model, String prompt, String image) {
-            this(model, prompt, List.of(image), false);
-        }
-    }
-
-    record CompletionResponse(String response) {}
-
+    record CompletionRequest(String model, String prompt, List<String> images, boolean stream) {}
 }
