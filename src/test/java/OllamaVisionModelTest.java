@@ -19,11 +19,12 @@ public class OllamaVisionModelTest {
     @Test
     public void visionModelWithOllama() throws IOException, InterruptedException {
         String imageName = "tc-ollama-moondream";
-        try (OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.42"))) {
+        try (OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"))) {
 
             try {
                 ollama.start();
             } catch (ContainerFetchException ex) {
+                // If image doesn't exist, create it. Subsequent runs will reuse the image.
                 createImage(imageName);
                 ollama.start();
             }
@@ -42,7 +43,7 @@ public class OllamaVisionModelTest {
     }
 
     public void createImage(String imageName) throws IOException, InterruptedException {
-        try (OllamaContainer ollama = new OllamaContainer("ollama/ollama:0.1.42")) {
+        try (OllamaContainer ollama = new OllamaContainer("ollama/ollama:0.1.44")) {
             ollama.start();
             ollama.execInContainer("ollama", "pull", "moondream");
             ollama.commitToImage(imageName);

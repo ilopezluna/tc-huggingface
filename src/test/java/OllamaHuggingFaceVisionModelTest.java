@@ -22,15 +22,18 @@ public class OllamaHuggingFaceVisionModelTest {
     public void visionModelWithHuggingFace() throws IOException {
         String repository = "vikhyatk/moondream2";
         String model = "moondream2-text-model-f16.gguf";
-        String imageName = "vision-model-from-hf-1";
+        String imageName = "vision-model-from-hf";
         String modelFile = """
                 FROM %s
+                TEMPLATE ""\"{{ if .Prompt }} Question: {{ .Prompt }}
+                
+                {{ end }} Answer: {{ .Response }}
+                ""\"
                 PARAMETER temperature 0
                 PARAMETER stop <|endoftext|>
-                TEMPLATE Question: {{ .Prompt }} Image: {{ range .Images }}{{ . }}{{ end }} Answer: {{ .Response }}
                 """.formatted(model);
         try (
-                OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.42"))
+                OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"))
         ) {
             try {
                 ollama.start();

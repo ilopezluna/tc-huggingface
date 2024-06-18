@@ -18,7 +18,7 @@ public class HuggingFaceEmbeddingModelTest {
         String model = "bge-small-en-v1.5-q4_k_m.gguf";
         String imageName = "embedding-model-from-hf";
         try (
-            OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.42"))
+            OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"))
         ) {
             try {
                 ollama.start();

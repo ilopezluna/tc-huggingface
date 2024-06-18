@@ -13,7 +13,7 @@ public class OllamaHuggingFaceContainer extends OllamaContainer {
     private final HuggingFaceModel huggingFaceModel;
 
     public OllamaHuggingFaceContainer(HuggingFaceModel model) {
-        super(DockerImageName.parse("ollama/ollama:0.1.42"));
+        super(DockerImageName.parse("ollama/ollama:0.1.44"));
         this.huggingFaceModel = model;
     }
 

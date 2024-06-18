@@ -21,7 +21,7 @@ public class HuggingFaceChatModelTest {
         String model = "distilabelorca-tinyllama-1.1b.Q8_0.gguf";
         String imageName = "qa-model-from-hf";
         try (
-                OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.42"))
+                OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"))
         ) {
             try {
                 ollama.start();
