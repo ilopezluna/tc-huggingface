@@ -13,13 +13,13 @@ public class HuggingFaceChatModelTest {
 
     @Test
     public void chatModelWithHuggingFace() {
-        //String repository = "TheBloke/Llama-2-7B-Chat-GGUF";
-        //String model = "llama-2-7b-chat.Q2_K.gguf";
-        //String imageName = "qa-model-from-hf-1";
+        String repository = "TinyLlama/TinyLlama-1.1B-Chat-v0.6";
+        String model = "ggml-model-q4_0.gguf";
+        String imageName = "qa-model-from-hf-1";
 
-        String repository = "DavidAU/DistiLabelOrca-TinyLLama-1.1B-Q8_0-GGUF";
-        String model = "distilabelorca-tinyllama-1.1b.Q8_0.gguf";
-        String imageName = "qa-model-from-hf";
+        //String repository = "DavidAU/DistiLabelOrca-TinyLLama-1.1B-Q8_0-GGUF";
+        //String model = "distilabelorca-tinyllama-1.1b.Q8_0.gguf";
+        //String imageName = "qa-model-from-hf";
         OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"));
         try {
             ollama.start();
