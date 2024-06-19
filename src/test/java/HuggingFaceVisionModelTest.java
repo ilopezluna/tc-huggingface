@@ -41,7 +41,7 @@ public class HuggingFaceVisionModelTest {
                 PARAMETER num_ctx 4096
                 """;
         try (
-                OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"))
+                OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44")).withReuse(true)
         ) {
             try {
                 ollama.start();
