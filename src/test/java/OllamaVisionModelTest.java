@@ -41,11 +41,10 @@ public class OllamaVisionModelTest {
     }
 
     public void createImage(String imageName) throws IOException, InterruptedException {
-        try (OllamaContainer ollama = new OllamaContainer("ollama/ollama:0.1.44")) {
-            ollama.start();
-            ollama.execInContainer("ollama", "pull", "moondream");
-            ollama.commitToImage(imageName);
-        }
+        OllamaContainer ollama = new OllamaContainer("ollama/ollama:0.1.44");
+        ollama.start();
+        ollama.execInContainer("ollama", "pull", "moondream");
+        ollama.commitToImage(imageName);
     }
 
     private static String getImageInBase64() throws IOException {

@@ -74,11 +74,10 @@ public class HuggingFaceVisionModelTest {
 
     private static void createImage(String imageName, String repository, String model, String modelfile, String visionAdapter) {
         var hfModel = new OllamaHuggingFaceContainer.HuggingFaceModel(repository, model, modelfile, visionAdapter);
-        try (var huggingFaceContainer = new OllamaHuggingFaceContainer(hfModel)) {
-            huggingFaceContainer.start();
-            huggingFaceContainer.commitToImage(imageName);
-            huggingFaceContainer.stop();
-        }
+        var huggingFaceContainer = new OllamaHuggingFaceContainer(hfModel);
+        huggingFaceContainer.start();
+        huggingFaceContainer.commitToImage(imageName);
+        huggingFaceContainer.stop();
     }
 
     record CompletionRequest(String model, String prompt, List<String> images, boolean stream) {

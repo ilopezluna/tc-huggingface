@@ -40,11 +40,10 @@ public class HuggingFaceEmbeddingModelTest {
 
     private static void createImage(String imageName, String repository, String model) {
         var hfModel = new OllamaHuggingFaceContainer.HuggingFaceModel(repository, model);
-        try (var huggingFaceContainer = new OllamaHuggingFaceContainer(hfModel)) {
-            huggingFaceContainer.start();
-            huggingFaceContainer.commitToImage(imageName);
-            huggingFaceContainer.stop();
-        }
+        var huggingFaceContainer = new OllamaHuggingFaceContainer(hfModel);
+        huggingFaceContainer.start();
+        huggingFaceContainer.commitToImage(imageName);
+        huggingFaceContainer.stop();
     }
 
     public record EmbeddingRequest(String model, String prompt) {

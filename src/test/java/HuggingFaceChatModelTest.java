@@ -40,11 +40,10 @@ public class HuggingFaceChatModelTest {
 
     private static void createImage(String imageName, String repository, String model) {
         var hfModel = new OllamaHuggingFaceContainer.HuggingFaceModel(repository, model);
-        try (var huggingFaceContainer = new OllamaHuggingFaceContainer(hfModel)) {
-            huggingFaceContainer.start();
-            huggingFaceContainer.commitToImage(imageName);
-            huggingFaceContainer.stop();
-        }
+        var huggingFaceContainer = new OllamaHuggingFaceContainer(hfModel);
+        huggingFaceContainer.start();
+        huggingFaceContainer.commitToImage(imageName);
+        huggingFaceContainer.stop();
     }
 
     record CompletionRequest(String model, List<Message> messages, boolean stream) {
