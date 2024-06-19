@@ -20,25 +20,22 @@ public class HuggingFaceChatModelTest {
         String repository = "DavidAU/DistiLabelOrca-TinyLLama-1.1B-Q8_0-GGUF";
         String model = "distilabelorca-tinyllama-1.1b.Q8_0.gguf";
         String imageName = "qa-model-from-hf";
-        try (
-                OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"))
-        ) {
-            try {
-                ollama.start();
-            } catch (ContainerFetchException ex) {
-                createImage(imageName, repository, model);
-                ollama.start();
-            }
-
-            String response = given()
-                    .baseUri(ollama.getEndpoint())
-                    .header(new Header("Content-Type", "application/json"))
-                    .body(new CompletionRequest(model + ":latest", List.of(new Message("user", "The meaning to life and the universe is")), false))
-                    .post("/api/chat")
-                    .getBody().as(ChatResponse.class).message.content;
-
-            System.out.println("Response from LLM (🤖)-> " + response);
+        OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"));
+        try {
+            ollama.start();
+        } catch (ContainerFetchException ex) {
+            createImage(imageName, repository, model);
+            ollama.start();
         }
+
+        String response = given()
+                .baseUri(ollama.getEndpoint())
+                .header(new Header("Content-Type", "application/json"))
+                .body(new CompletionRequest(model + ":latest", List.of(new Message("user", "The meaning to life and the universe is")), false))
+                .post("/api/chat")
+                .getBody().as(ChatResponse.class).message.content;
+
+        System.out.println("Response from LLM (🤖)-> " + response);
     }
 
     private static void createImage(String imageName, String repository, String model) {
@@ -50,9 +47,11 @@ public class HuggingFaceChatModelTest {
         }
     }
 
-    record CompletionRequest(String model, List<Message> messages, boolean stream) {}
+    record CompletionRequest(String model, List<Message> messages, boolean stream) {
+    }
 
-    record Message(String role, String content) {}
+    record Message(String role, String content) {
+    }
 
     record ChatResponse(Message message) {
     }

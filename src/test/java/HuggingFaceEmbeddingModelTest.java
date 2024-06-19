@@ -17,17 +17,15 @@ public class HuggingFaceEmbeddingModelTest {
         String repository = "CompendiumLabs/bge-small-en-v1.5-gguf";
         String model = "bge-small-en-v1.5-q4_k_m.gguf";
         String imageName = "embedding-model-from-hf";
-        try (
-            OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"))
-        ) {
-            try {
-                ollama.start();
-            } catch (ContainerFetchException ex) {
-                createImage(imageName, repository, model);
-                ollama.start();
-            }
+        OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"));
+        try {
+            ollama.start();
+        } catch (ContainerFetchException ex) {
+            createImage(imageName, repository, model);
+            ollama.start();
+        }
 
-            List<Float> embedding = given()
+        List<Float> embedding = given()
                 .baseUri(ollama.getEndpoint())
                 .header(new Header("Content-Type", "application/json"))
                 .body(new EmbeddingRequest(model + ":latest", "Hello from Testcontainers!"))
@@ -35,10 +33,9 @@ public class HuggingFaceEmbeddingModelTest {
                 .jsonPath()
                 .getList("embedding");
 
-            assertThat(embedding).isNotNull();
-            assertThat(embedding.isEmpty()).isFalse();
-            System.out.println("Response from LLM (🤖)-> " + embedding);
-        }
+        assertThat(embedding).isNotNull();
+        assertThat(embedding.isEmpty()).isFalse();
+        System.out.println("Response from LLM (🤖)-> " + embedding);
     }
 
     private static void createImage(String imageName, String repository, String model) {
@@ -50,5 +47,6 @@ public class HuggingFaceEmbeddingModelTest {
         }
     }
 
-    public record EmbeddingRequest(String model, String prompt) {}
+    public record EmbeddingRequest(String model, String prompt) {
+    }
 }

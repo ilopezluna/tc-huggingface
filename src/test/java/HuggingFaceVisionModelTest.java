@@ -40,32 +40,29 @@ public class HuggingFaceVisionModelTest {
                 PARAMETER num_keep 4
                 PARAMETER num_ctx 4096
                 """;
-        try (
-                OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44")).withReuse(true)
-        ) {
-            try {
-                ollama.start();
-            } catch (ContainerFetchException ex) {
-                createImage(imageName, repository, model, modelfile, visionAdapter);
-                ollama.start();
-            }
+        OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44")).withReuse(true);
+        try {
+            ollama.start();
+        } catch (ContainerFetchException ex) {
+            createImage(imageName, repository, model, modelfile, visionAdapter);
+            ollama.start();
+        }
 
-            var image1 = getImageInBase64("car.jpeg");
-            var image2 = getImageInBase64("cat.jpeg");
-            var image3 = getImageInBase64("whale.jpeg");
-            var image4 = getImageInBase64("computer.jpeg");
+        var image1 = getImageInBase64("car.jpeg");
+        var image2 = getImageInBase64("cat.jpeg");
+        var image3 = getImageInBase64("whale.jpeg");
+        var image4 = getImageInBase64("computer.jpeg");
 
-            var images = List.of(image1, image2, image3, image4);
-            for (String image : images) {
-                String response = given()
-                        .baseUri(ollama.getEndpoint())
-                        .header(new Header("Content-Type", "application/json"))
-                        .body(new CompletionRequest(model + ":latest", "Describe the image in max 10 words", List.of(image), false))
-                        .post("/api/generate")
-                        .getBody().as(CompletionResponse.class).response();
+        var images = List.of(image1, image2, image3, image4);
+        for (String image : images) {
+            String response = given()
+                    .baseUri(ollama.getEndpoint())
+                    .header(new Header("Content-Type", "application/json"))
+                    .body(new CompletionRequest(model + ":latest", "Describe the image in max 10 words", List.of(image), false))
+                    .post("/api/generate")
+                    .getBody().as(CompletionResponse.class).response();
 
-                System.out.println("Response from LLM (🤖)-> " + response);
-            }
+            System.out.println("Response from LLM (🤖)-> " + response);
         }
     }
 

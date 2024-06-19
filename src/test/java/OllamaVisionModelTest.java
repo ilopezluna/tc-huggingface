@@ -19,27 +19,25 @@ public class OllamaVisionModelTest {
     @Test
     public void visionModelWithOllama() throws IOException, InterruptedException {
         String imageName = "tc-ollama-moondream";
-        try (OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"))) {
-
-            try {
-                ollama.start();
-            } catch (ContainerFetchException ex) {
-                // If image doesn't exist, create it. Subsequent runs will reuse the image.
-                createImage(imageName);
-                ollama.start();
-            }
-
-            var image = getImageInBase64();
-
-            String response = given()
-                    .baseUri(ollama.getEndpoint())
-                    .header(new Header("Content-Type", "application/json"))
-                    .body(new CompletionRequest("moondream:latest", "Describe the image.", Collections.singletonList(image), false))
-                    .post("/api/generate")
-                    .getBody().as(CompletionResponse.class).response();
-
-            System.out.println("Response from LLM (🤖)-> " + response);
+        OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"));
+        try {
+            ollama.start();
+        } catch (ContainerFetchException ex) {
+            // If image doesn't exist, create it. Subsequent runs will reuse the image.
+            createImage(imageName);
+            ollama.start();
         }
+
+        var image = getImageInBase64();
+
+        String response = given()
+                .baseUri(ollama.getEndpoint())
+                .header(new Header("Content-Type", "application/json"))
+                .body(new CompletionRequest("moondream:latest", "Describe the image.", Collections.singletonList(image), false))
+                .post("/api/generate")
+                .getBody().as(CompletionResponse.class).response();
+
+        System.out.println("Response from LLM (🤖)-> " + response);
     }
 
     public void createImage(String imageName) throws IOException, InterruptedException {
