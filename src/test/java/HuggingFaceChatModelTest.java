@@ -13,13 +13,9 @@ public class HuggingFaceChatModelTest {
 
     @Test
     public void chatModelWithHuggingFace() {
-        String repository = "TinyLlama/TinyLlama-1.1B-Chat-v0.6";
-        String model = "ggml-model-q4_0.gguf";
-        String imageName = "qa-model-from-hf-1";
-
-        //String repository = "DavidAU/DistiLabelOrca-TinyLLama-1.1B-Q8_0-GGUF";
-        //String model = "distilabelorca-tinyllama-1.1b.Q8_0.gguf";
-        //String imageName = "qa-model-from-hf";
+        String repository = "DavidAU/DistiLabelOrca-TinyLLama-1.1B-Q8_0-GGUF";
+        String model = "distilabelorca-tinyllama-1.1b.Q8_0.gguf";
+        String imageName = "qa-model-from-hf";
         OllamaContainer ollama = new OllamaContainer(DockerImageName.parse(imageName).asCompatibleSubstituteFor("ollama/ollama:0.1.44"));
         try {
             ollama.start();
@@ -31,7 +27,7 @@ public class HuggingFaceChatModelTest {
         String response = given()
                 .baseUri(ollama.getEndpoint())
                 .header(new Header("Content-Type", "application/json"))
-                .body(new CompletionRequest(model + ":latest", List.of(new Message("user", "The meaning to life and the universe is")), false))
+                .body(new CompletionRequest(model + ":latest", List.of(new Message("user", "What is the capital of France?")), false))
                 .post("/api/chat")
                 .getBody().as(ChatResponse.class).message.content;
 
@@ -43,7 +39,6 @@ public class HuggingFaceChatModelTest {
         var huggingFaceContainer = new OllamaHuggingFaceContainer(hfModel);
         huggingFaceContainer.start();
         huggingFaceContainer.commitToImage(imageName);
-        huggingFaceContainer.stop();
     }
 
     record CompletionRequest(String model, List<Message> messages, boolean stream) {
