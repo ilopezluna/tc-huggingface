@@ -77,7 +77,6 @@ public class HuggingFaceVisionModelTest {
         var huggingFaceContainer = new OllamaHuggingFaceContainer(hfModel);
         huggingFaceContainer.start();
         huggingFaceContainer.commitToImage(imageName);
-        huggingFaceContainer.stop();
     }
 
     record CompletionRequest(String model, String prompt, List<String> images, boolean stream) {
