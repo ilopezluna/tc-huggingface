@@ -43,7 +43,6 @@ public class HuggingFaceEmbeddingModelTest {
         var huggingFaceContainer = new OllamaHuggingFaceContainer(hfModel);
         huggingFaceContainer.start();
         huggingFaceContainer.commitToImage(imageName);
-        huggingFaceContainer.stop();
     }
 
     public record EmbeddingRequest(String model, String prompt) {
