@@ -28,7 +28,7 @@ public class OllamaVisionModelTest {
             ollama.start();
         }
 
-        var image = getImageInBase64();
+        var image = getImageInBase64("/whale.jpeg");
 
         String response = given()
                 .baseUri(ollama.getEndpoint())
@@ -47,8 +47,8 @@ public class OllamaVisionModelTest {
         ollama.commitToImage(imageName);
     }
 
-    private static String getImageInBase64() throws IOException {
-        URL resourceUrl = OllamaVisionModelTest.class.getResource("/whale.jpeg");
+    private static String getImageInBase64(String name) throws IOException {
+        URL resourceUrl = OllamaVisionModelTest.class.getResource(name);
         byte[] fileContent = FileUtils.readFileToByteArray(new File(resourceUrl.getFile()));
         return Base64.getEncoder().encodeToString(fileContent);
     }
