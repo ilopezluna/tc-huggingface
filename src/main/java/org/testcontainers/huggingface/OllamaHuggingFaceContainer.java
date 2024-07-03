@@ -2,7 +2,6 @@ package org.testcontainers.huggingface;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import org.testcontainers.containers.ContainerLaunchException;
-import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.ollama.OllamaContainer;
 import org.testcontainers.utility.DockerImageName;
 
@@ -13,81 +12,44 @@ public class OllamaHuggingFaceContainer extends OllamaContainer {
     private final HuggingFaceModel huggingFaceModel;
 
     public OllamaHuggingFaceContainer(HuggingFaceModel model) {
-        super(DockerImageName.parse("ollama/ollama:0.1.44"));
+        super(DockerImageName.parse("ollama/ollama:0.1.47"));
         this.huggingFaceModel = model;
-    }
-
-    @Override
-    protected void configure() {
-        super.configure();
-
-        if (huggingFaceModel != null) {
-            this.setImage(
-                    new ImageFromDockerfile()
-                        .withDockerfileFromBuilder(builder -> {
-                            builder
-                                .from(this.getDockerImageName())
-                                .run("apt-get update && apt-get upgrade -y && apt-get install -y python3-pip")
-                                .run("pip install huggingface-hub")
-                                .build();
-                        })
-                );
-        }
     }
 
     @Override
     protected void containerIsStarted(InspectContainerResponse containerInfo, boolean reused) {
         super.containerIsStarted(containerInfo, reused);
-        if (reused) {
-            return;
-        }
-
-        if (huggingFaceModel == null) {
+        if (reused || huggingFaceModel == null) {
             return;
         }
 
         try {
-            ExecResult downloadModelFromHF = execInContainer(
-                "huggingface-cli",
-                "download",
-                huggingFaceModel.repository,
-                huggingFaceModel.model,
-                "--local-dir",
-                "."
-            );
-            if (downloadModelFromHF.getExitCode() > 0) {
-                throw new ContainerLaunchException("Failed to download model: " + downloadModelFromHF.getStderr());
-            }
-
-            if (huggingFaceModel.visionAdapter != null) {
-                ExecResult downloadVisionAdapter = execInContainer(
+            executeCommand("apt-get", "update");
+            executeCommand("apt-get", "upgrade", "-y");
+            executeCommand("apt-get", "install", "-y", "python3-pip");
+            executeCommand("pip", "install", "huggingface-hub");
+            executeCommand(
                     "huggingface-cli",
                     "download",
                     huggingFaceModel.repository,
-                    huggingFaceModel.visionAdapter,
+                    huggingFaceModel.model,
                     "--local-dir",
                     "."
-                );
-                if (downloadVisionAdapter.getExitCode() > 0) {
-                    throw new ContainerLaunchException("Failed to download vision adapter: " + downloadVisionAdapter.getStderr());
-                }
-            }
-
-            ExecResult fillModelFile = execInContainer(
-                "sh",
-                "-c",
-                String.format("echo '%s' > Modelfile", huggingFaceModel.modelfileContent)
             );
-            if (fillModelFile.getExitCode() > 0) {
-                throw new ContainerLaunchException("Failed to fill Modelfile: " + fillModelFile.getStderr());
-            }
-
-            ExecResult buildModel = execInContainer("ollama", "create", huggingFaceModel.model, "-f", "Modelfile");
-            if (buildModel.getExitCode() > 0) {
-                throw new ContainerLaunchException("Failed to build model: " + buildModel.getStderr());
-            }
+            executeCommand("sh", "-c", String.format("echo '%s' > Modelfile", huggingFaceModel.modelfileContent));
+            executeCommand("ollama", "create", huggingFaceModel.model, "-f", "Modelfile");
+            executeCommand("rm", huggingFaceModel.model);
         } catch (IOException | InterruptedException e) {
             throw new ContainerLaunchException(e.getMessage());
+        }
+    }
+
+    private void executeCommand(String... command) throws ContainerLaunchException, IOException, InterruptedException {
+        ExecResult execResult = execInContainer(command);
+        if (execResult.getExitCode() > 0) {
+            throw new ContainerLaunchException(
+                    "Failed to execute " + String.join(" ", command) + ": " + execResult.getStderr()
+            );
         }
     }
 
