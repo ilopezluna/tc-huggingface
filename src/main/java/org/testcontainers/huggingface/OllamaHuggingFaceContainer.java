@@ -36,6 +36,16 @@ public class OllamaHuggingFaceContainer extends OllamaContainer {
                     "--local-dir",
                     "."
             );
+            if (huggingFaceModel.visionAdapter != null) {
+                executeCommand(
+                        "huggingface-cli",
+                        "download",
+                        huggingFaceModel.repository,
+                        huggingFaceModel.visionAdapter,
+                        "--local-dir",
+                        "."
+                );
+            }
             executeCommand("sh", "-c", String.format("echo '%s' > Modelfile", huggingFaceModel.modelfileContent));
             executeCommand("ollama", "create", huggingFaceModel.model, "-f", "Modelfile");
             executeCommand("rm", huggingFaceModel.model);
